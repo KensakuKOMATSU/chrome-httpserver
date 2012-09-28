@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "simple HTTP server",
+  "description": "something what ridiculous simple web server",
+  "version": "0.1",
+  "minimum_chrome_version": "24",
+  "app": {
+    "background": {
+      "scripts": ["httpserver.js"]
+    }
+  },
+  "permissions": [
+    "experimental",
+    {"socket": [
+      "tcp-listen"
+    ]}
+  ]
+}
