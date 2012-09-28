@@ -1,5 +1,3 @@
-var s;
-
 function t2ab(str /* String */) {
     var buffer = new ArrayBuffer(str.length);
     var view = new DataView(buffer);
@@ -50,10 +48,9 @@ var response = function(str){
 
 
 chrome.socket.create('tcp', {}, function(e){
-  s = e;
+  var s = e;
 
   chrome.socket.listen(s.socketId, "0.0.0.0", 0, 10, function(e){
-    console.dir(e);
     chrome.socket.getInfo(s.socketId, function(e){
       console.dir("Local web server's URL => http://localhost:"+e.localPort+"/"); // you can check listen port :)
     });
@@ -70,6 +67,3 @@ chrome.socket.create('tcp', {}, function(e){
     accept_(s.socketId);
   });
 });
-
-
-
