@@ -7,15 +7,15 @@ function t2ab(str /* String */) {
     return buffer;
 }
 
-
-var echo_ = function(sid) {
-  var sid_ = e.socketId;
-  chrome.socket.read(sid_, 65535, function(e){
-    chrome.socket.write(s_, e.data, function(e){
-      chrome.socket.destroy(s_);
-    });
-  })
+function ab2t(buffer /* ArrayBuffer */) {
+  var arr = new Int8Array(buffer);
+  var str = "";
+  for(var i = 0, l = arr.length; i < l; i++) {
+    str += String.fromCharCode.call(this, arr[i]);
+  }
+  return str;
 }
+
 
 var RESPHEAD = [
   "HTTP/1.1 200 OK",
@@ -46,22 +46,35 @@ var response = function(str){
 }
 
 
+var rtw = function(sid) {
+  // [TODO]
+  // call recursive for keep-alive features
+  // currently, I haven't tested.
+  chrome.socket.read(sid, 65535, function(e){
+    console.log(ab2t(e.data));
+    if(e.resultCode < 0) {
+      chrome.socket.destroy(sid);
+      return;
+    }
+    chrome.socket.write(sid, t2ab(response(RESP)), function(e){
+      // [TODO] check datasize
+      console.dir(e);
+      rtw(sid);
+    });
+  });
+}
 
 chrome.socket.create('tcp', {}, function(e){
   var s = e;
 
   chrome.socket.listen(s.socketId, "0.0.0.0", 0, 10, function(e){
     chrome.socket.getInfo(s.socketId, function(e){
-      console.dir("Local web server's URL => http://localhost:"+e.localPort+"/"); // you can check listen port :)
+      console.log("Local web server's URL => http://localhost:"+e.localPort+"/"); // you can check listen port :)
     });
     var accept_ = function(sid){
       chrome.socket.accept(sid, function(e){
-        var sid_ = e.socketId;
-        chrome.socket.read(sid_, 65535, function(e){
-          chrome.socket.write(sid_, t2ab(response(RESP)), function(e){});
-          chrome.socket.destroy(sid_);
-        });
-        accept_(sid);
+        rtw(e.socketId);
+        accept_(s.socketId);
       });
     }
     accept_(s.socketId);
